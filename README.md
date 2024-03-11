@@ -1,6 +1,6 @@
 # AiohttpModule
 ## How to call the Module? So easy!
-```bash
+```shell
 git clone https://github.com/R4be1/AiohttpModule.git
 ```
 
