@@ -1,5 +1,7 @@
 # AiohttpModule
 ## How to call the Module? So easy!
+git clone https://github.com/R4be1/AiohttpModule.git
+
 ```python3
 from AiohttpModule.aiocore import requests_responses
 tasks = [
