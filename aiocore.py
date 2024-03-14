@@ -16,13 +16,14 @@ async def requests_async_function_(tasks, URL=True, STATUS_CODE=True, TEXT_LENGT
 
         async def async_request(task):
             if not task: return dict()
+            if type(task)==str: task = { "url" : task }
             try:
                 async with _semaphore:
                     start_time=time.time()
                     async with session.request(
-                            url = urljoin( task.get( "webroot" ),task.get("path") ),
                             method = "GET" if not task.get( "data" ) else "POST",
                             timeout = aiohttp.ClientTimeout( total=174 ),
+                            url = urljoin( task.get( "webroot" ),task.get("path") ) if not task.get("url") else task.get("url"),
                             headers = {"User-Agent":"Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0"},
                             params = task.get( "params" ),
                             data = task.get( "data" )
