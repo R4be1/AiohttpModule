@@ -7,11 +7,11 @@ import traceback
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
-async def requests_async_function_(tasks, URL=True, STATUS_CODE=True, TEXT_LENGTH=True, HEADERS=True, TEXT=True, CONTENT=False, semaphore=2048):
+async def requests_async_function_(tasks, URL=True, STATUS_CODE=True, TEXT_LENGTH=True, HEADERS=True, TEXT=True, CONTENT=False, semaphore=2048, timeout=300):
 
     media_type = ["image/","video/","audio/","application/zip","application/x-rar-compressed","application/x-tar","application/gzip","application/x-7z-compressed","application/pdf","application/msword","application/vnd.ms-excel","application/vnd.ms-powerpoint","application/font"]
 
-    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=700),connector=aiohttp.TCPConnector(ssl=False)) as session:
+    async with aiohttp.ClientSession( timeout=aiohttp.ClientTimeout(total=timeout), connector=aiohttp.TCPConnector(ssl=False, limit=semaphore) ) as session:
         _semaphore = asyncio.Semaphore(semaphore) if semaphore else asyncio.Semaphore()
 
         async def async_request(task):
@@ -22,7 +22,7 @@ async def requests_async_function_(tasks, URL=True, STATUS_CODE=True, TEXT_LENGT
                     start_time=time.time()
                     async with session.request(
                             method = "GET" if not task.get( "data" ) else "POST",
-                            timeout = aiohttp.ClientTimeout( total=174 ),
+                            timeout = aiohttp.ClientTimeout( total=timeout ),
                             url = urljoin( task.get( "webroot" ),task.get("path") ) if not task.get("url") else task.get("url"),
                             headers = {"User-Agent":"Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0"},
                             params = task.get( "params" ),
@@ -69,6 +69,6 @@ async def requests_async_function_(tasks, URL=True, STATUS_CODE=True, TEXT_LENGT
         responses = await asyncio.gather(*tasks)
     return responses
 
-def requests_responses(tasks, semaphore=2048) -> list():
-    responses = asyncio.run(requests_async_function_(tasks,semaphore))
+def requests_responses(tasks, semaphore=2048, timeout=300) -> list():
+    responses = asyncio.run(requests_async_function_(tasks))
     return responses
